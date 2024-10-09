@@ -94,6 +94,9 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
     ) {
         results = poseLandmarkerResults
 
+        // call Gait Analysis Function
+        GaitAnalysis(poseLandmarkerResults)
+
         this.imageHeight = imageHeight
         this.imageWidth = imageWidth
 
@@ -110,6 +113,73 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
             }
         }
         invalidate()
+    }
+
+    fun GaitAnalysis(calcValues: PoseLandmarkerResult)
+    {
+        // get external storage
+        var path_name = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString()
+
+        // set file path
+        val file = File(path_name,"Alexisfield_moving_camera.csv")
+
+        // set up timestamp
+        val currentTime: Date = Calendar.getInstance().time;
+        val formatter = SimpleDateFormat("yyyy-MM-dd:hh:mm:ss:SSS")
+        val dateString = formatter.format(currentTime)
+
+        file.appendText(dateString.toString()+",")
+
+        var check = calcValues.landmarks()
+
+        // iterate through landmarks
+        for(j in check)
+        {
+            for(i in j)
+            {
+                var x_value = i.x() // get x
+                var y_value = i.y() // get y
+                var z_value = i.z() // get z
+                var visible = i.visibility() // get visibility
+                var present = i.presence() // get presence
+                var line = x_value.toString()+","+y_value.toString()+","+z_value.toString()+","+visible.toString()+","+present.toString()+","
+                file.appendText(line)
+                //Log.d("X Values", i.x().toString());
+            }
+            file.appendText("END OF MEASUREMENT BLOCK"+"\n")
+
+        }
+
+//        // get path to external storage in Documents
+//        var path_name = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString()
+//        // create File
+//        val file = File(path_name,"test_new.csv")
+//
+//        // get current time
+//        val currentTime: Date = Calendar.getInstance().time;
+//        // format date into specific format
+//        val formatter = SimpleDateFormat("yyyy-MM-dd:hh:mm:ss:SSS")
+//        // format current time
+//        val dateString = formatter.format(currentTime)
+//
+//        // add to csv file
+//        file.appendText(dateString.toString()+",")
+//        // iterate through normalized landmark values
+//        for (i in calcValues)
+//        {
+//            var x_value = i.x() // get x
+//            var y_value = i.y() // get y
+//            var z_value = i.z() // get z
+//            var visible = i.visibility() // get visibility
+//            var present = i.presence() // get presence
+//
+//            // format and append to csv file
+//            var line = x_value.toString()+","+y_value.toString()+","+z_value.toString()+","+visible.toString()+","+present.toString()+","
+//            file.appendText(line)
+//            //file.appendText("\n")
+//        }
+//        // add end of measurement text
+//        file.appendText("END OF MEASUREMENT BLOCK"+"\n")
     }
 
     companion object {
